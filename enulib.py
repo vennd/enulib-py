@@ -4,6 +4,16 @@ import hmac
 import time
 import json
 
+test_mode = 'true'
+enu_api_base_url = 'https://enu.io'
+enu_api_test_base_url = 'http://localhost:8080'
+
+def get_base_url():
+    if test_mode == 'true':
+        return enu_api_test_base_url
+    else:
+        return enu_api_base_url
+
 
 def hmac_sha512(secret, data):
     digest = hmac.new(str(secret), msg=str(data), digestmod=hashlib.sha512).digest()
@@ -14,7 +24,6 @@ def hmac_sha512(secret, data):
 def create_payment(destinationAddress, amount, asset, paymentId, txFee):
     with open('enu_key.json') as json_config_file:
         config = json.load(json_config_file)
-    # print(config)
 
     data = {
         'destinationAddress': destinationAddress,
@@ -35,7 +44,7 @@ def create_payment(destinationAddress, amount, asset, paymentId, txFee):
         'Content-Type': 'application/json'
     }
 
-    r = requests.post('https://enu.io/payment', data=jsonData, headers=headers, verify=False)
+    r = requests.post(get_base_url() + '/payment', data=jsonData, headers=headers, verify=False)
     # print "Response code: " + str(r.status_code)
     # print "Response content: " + r.text
 
@@ -58,7 +67,7 @@ def get_payment(paymentId):
         'Content-Type': 'application/json'
     }
 
-    r = requests.get('https://enu.io/payment/' + paymentId, data=jsonData, headers=headers, verify=False)
+    r = requests.get(get_base_url() + '/payment/' + paymentId, data=jsonData, headers=headers, verify=False)
     # r = requests.get('http://localhost:8080/payment/' + paymentId, data=jsonData, headers=headers, verify=False)
     # print "Response code: " + str(r.status_code)
     # print "Response content: " + r.text
